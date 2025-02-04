@@ -6,12 +6,11 @@ from StockDetails import Metric, KeyMetrics, StockData, PriceRange, StockPriceAn
     TechnicalAnalysis, AnalystRecommendations, Shareholding
 
 
-async def fetch_stock_data():
-    url = "https://trendlyne.com/equity/533/HDFCBANK/hdfc-bank-ltd/"
+async def fetch_stock_data(url):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)  # Set headless=False to see the browser action
         page = await browser.new_page()
-        await page.goto(url)
+        await page.goto(url, timeout = 100000)
 
         # Scroll down the page to load dynamic content
         await scroll_page(page)
@@ -44,9 +43,11 @@ async def fetch_stock_data():
                               stock_price_analysis=stock_price_analysis, stock_analysis=insights_list,
                               technical_analysis=analysis,
                               analyst_recommendations=analyst_recommendations, holdings=shareholding)
-        print(stockdata)
         # Close the browser
         await browser.close()
+
+        return stockdata
+
 
 async def scroll_page(page):
     for _ in range(7):  # Adjust the range to scroll more times if needed
@@ -468,4 +469,4 @@ def create_key_metrics(metrics_data):
 
 
 # Run the asynchronous function
-asyncio.run(fetch_stock_data())
+asyncio.run(fetch_stock_data("https://trendlyne.com/equity/13/AARTIDRUGS/aarti-drugs-ltd/"))

@@ -1,16 +1,21 @@
 import json
 import os
 import time
-from playwright.sync_api import sync_playwright
 from datetime import datetime, timedelta
+from playwright.sync_api import sync_playwright
+
 tweet_objects = []
 
 
 def scroll_down_slowly(page):
-    page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(2)
+    """Scrolls down the page to load more tweets dynamically."""
+    for _ in range(3):  # Scroll multiple times for better coverage
+        page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
+
 
 def get_tweets(page):
+    """Extracts tweets from the current Twitter page."""
     articles = page.query_selector_all("article[data-testid='tweet']")
     user_names, time_stamps, tweets, published_dates = [], [], [], []
 
@@ -20,19 +25,18 @@ def get_tweets(page):
         if time_element:
             datetime_value = time_element.get_attribute("datetime")
 
-            # Extract user name
             user_name_element = article.query_selector("div[data-testid='User-Name']")
             if user_name_element:
                 user_name = user_name_element.text_content().split('\n')[0]
                 cleaned_user_name = user_name.split('@')[0].strip()
 
                 time_stamp = datetime.strptime(datetime_value, "%Y-%m-%dT%H:%M:%S.%fZ").replace(microsecond=0)
-                formatted_date = time_stamp.strftime("%d %b,%Y")
+                formatted_date = time_stamp.strftime("%d %b, %Y")
 
-                # Extract tweet text
                 tweet_element = article.query_selector("div[data-testid='tweetText']")
                 tweet = tweet_element.text_content() if tweet_element else ""
 
+                # Ensure tweet is recent (within last 2 days)
                 date_to_compare = (datetime.utcnow() - timedelta(days=2)).replace(microsecond=0)
                 if time_stamp > date_to_compare:
                     published_dates.append(formatted_date)
@@ -41,50 +45,47 @@ def get_tweets(page):
 
     return user_names, published_dates, tweets
 
+
 def scrape_tweets(page, unique_tweets):
+    """Scrapes tweets while avoiding duplicates."""
     user_names, published_dates, tweets = get_tweets(page)
 
     for user_name, published_date, tweet in zip(user_names, published_dates, tweets):
-        # Combine user_name, published_date, and a hash of the tweet content for a unique key
-        tweet_hash = hash(tweet)  # Create a hash for the tweet content
+        tweet_hash = hash(tweet)
         unique_tweet_key = f"{user_name}-{published_date}-{tweet_hash}"
 
         if unique_tweet_key not in unique_tweets:
-            print('tweet', tweet)
+            print('tweet:', tweet)
             unique_tweets.add(unique_tweet_key)
-            tweet_obj = {
+            tweet_objects.append({
                 "username": user_name,
                 "tweet": tweet,
                 "published_date": published_date,
-            }
-
-            tweet_objects.append(tweet_obj)
+            })
 
     scroll_down_slowly(page)
 
+
 def login_twitter(page, username, password):
-    url = "https://twitter.com/i/flow/login"
-    page.goto(url,timeout=60000, wait_until="load")
+    """Logs into Twitter using provided credentials."""
+    page.goto("https://twitter.com/i/flow/login", timeout=60000, wait_until="load")
+
     page.fill('input[autocomplete="username"]', username)
     page.keyboard.press('Enter')
-    page.wait_for_timeout(3000)
+    page.wait_for_selector('input[name="password"]', timeout=60000)  # Wait until password field appears
     page.fill('input[name="password"]', password)
     page.keyboard.press('Enter')
-    page.wait_for_timeout(4000)  # Allow time for login to complete
+    page.wait_for_selector("nav[aria-label='Primary']", timeout=60000)  # Wait for homepage to load
 
 
-
-def getTweetData():
+def get_tweet_data():
+    """Fetches tweets from multiple Twitter accounts and saves them."""
     twitter_handlers = ["Abhi4Research", "AimInvestments", "viveksingh2010", "AnirbanManna10", "dhuperji", "SnehaSSR", "TradingMarvel", "sainaman2", "sushilpathiyar", "Trading0secrets",
-                        "indian_stockss","nilishamantri_","MySoctr", "rdkriplani","Milind4profits","jayneshkasliwal", "breakoutsfreak", "adeptmarket","tbportal","beyondtrading07","gogrithekhabri",
-                        "wealthexpress21","StockInfotech","mystocks_in","saditya10p","KhapreVishal","_ChartWizard_","curious_shubh","marketViewbyPB","Deishma","KommawarSwapnil","Sahilpahwa09","fintech00",
-                        "sunilgurjar01","CaVivekkhatri","KhapreVishal","itsprekshaBaid","thebigbulldeals","TbPortal","Bnf_unicorn","pahari_trader","darvasboxtrader"]
+                        "indian_stockss","nilishamantri_","MySoctr", "rdkriplani"]
 
-    # Divide handlers into two groups
     handlers_user1 = twitter_handlers[:len(twitter_handlers) // 2]
     handlers_user2 = twitter_handlers[len(twitter_handlers) // 2:]
 
-    # User credentials
     accounts = [
         {"username": "SamStockPicks", "password": "Bond@007", "handlers": handlers_user1},
         {"username": "AtoZKidsApp", "password": "Atozkids@2020", "handlers": handlers_user2}
@@ -105,45 +106,41 @@ def getTweetData():
 
             for target_url in handlers:
                 page.goto(f"https://twitter.com/{target_url}", timeout=100000, wait_until="load")
-                time.sleep(20)
+                page.wait_for_selector("article[data-testid='tweet']", timeout=100000)  # Ensure tweets load
                 scrape_tweets(page, unique_tweets)
 
             page.close()
 
-        today = datetime.today().strftime('%Y-%m-%d')  # Format: YYYY-MM-DD
-        folder_path = os.path.join("Data", "TweetData")
-        os.makedirs(folder_path, exist_ok=True)
-        filename = f"tweeterData_{today}.json"
-        file_path = os.path.join(folder_path, filename)
-
-        # Write tweet objects to JSON file
-        append_or_create_json(file_path, tweet_objects)
-
         browser.close()
 
+    save_tweets_to_json()
     return tweet_objects
 
 
-def append_or_create_json(file_path, tweet_objects):
-    """
-    Appends tweet_objects to an existing JSON file if it exists,
-    or creates a new file and writes tweet_objects if the file does not exist.
+def save_tweets_to_json():
+    """Saves tweet objects to a JSON file."""
+    today = datetime.today().strftime('%Y-%m-%d')
+    folder_path = os.path.join("Data", "TweetData")
+    os.makedirs(folder_path, exist_ok=True)
+    file_path = os.path.join(folder_path, f"tweeterData_{today}.json")
 
-    Args:
-    - file_path (str): Path to the JSON file.
-    - tweet_objects (list): List of tweet objects to be written or appended to the file.
-    """
-    # Check if the file already exists
+    append_or_create_json(file_path, tweet_objects)
+
+
+def append_or_create_json(file_path, tweet_objects):
+    """Appends tweets to an existing JSON file or creates a new one if it does not exist."""
     if os.path.exists(file_path):
-        # If the file exists, read the existing content
         with open(file_path, 'r') as json_file:
             existing_data = json.load(json_file)
-        # Append new data to the existing content
+
         existing_data.extend(tweet_objects)
-        # Write the updated content back to the file
+
         with open(file_path, 'w') as json_file:
             json.dump(existing_data, json_file, indent=4)
     else:
-        # If the file doesn't exist, create a new one and write the data
         with open(file_path, 'w') as json_file:
             json.dump(tweet_objects, json_file, indent=4)
+
+
+if __name__ == "__main__":
+    get_tweet_data()
