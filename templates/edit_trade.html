@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Edit Trade{% endblock %}
+{% block content %}
+  <h2 class="mb-3">Edit Trade</h2>
+  <form action="{{ url_for('edit_trade', trade_id=trade['_id']) }}" method="post" enctype="multipart/form-data">
+    <!-- First row: Read-only Stock Symbol and Stock Name -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="stock_symbol" class="form-label">Stock Symbol:</label>
+        <input type="text" name="stock_symbol" id="stock_symbol" class="form-control bg-readonly" value="{{ trade.stock_symbol }}" required readonly>
+      </div>
+      <div class="col-md-6">
+        <label for="stock_name" class="form-label">Stock Name:</label>
+        <input type="text" name="stock_name" id="stock_name" class="form-control bg-readonly" value="{{ trade.stock_name }}" required readonly>
+      </div>
+    </div>
+    <!-- Second row: Exit Price and Exit Trigger -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="exit_price" class="form-label">Exit Price:</label>
+        <input type="number" step="0.01" name="exit_price" id="exit_price" class="form-control" value="{{ trade.exit_price }}">
+      </div>
+      <div class="col-md-6">
+        <label for="exit_trigger" class="form-label">Exit Trigger:</label>
+        <input type="text" name="exit_trigger" id="exit_trigger" class="form-control" value="{{ trade.exit_trigger }}">
+      </div>
+    </div>
+    <!-- Third row: Exit Chart Image and Notes -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="exit_chart_image" class="form-label">Exit Chart Image:</label>
+        <input type="file" name="exit_chart_image" id="exit_chart_image" class="form-control" accept="image/*">
+      </div>
+      <div class="col-md-6">
+        <label for="notes" class="form-label">Notes:</label>
+        <textarea name="notes" id="notes" class="form-control" rows="4">{{ trade.notes }}</textarea>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Update Trade</button>
+  </form>
+{% endblock %}

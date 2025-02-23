@@ -466,7 +466,3 @@ def create_key_metrics(metrics_data):
         roe_annual=Metric(value=metrics_data.get("ROE Annual %", {}).get("value"),
                           conclusion=metrics_data.get("ROE Annual %", {}).get("text"))
     )
-
-
-# Run the asynchronous function
-asyncio.run(fetch_stock_data("https://trendlyne.com/equity/13/AARTIDRUGS/aarti-drugs-ltd/"))

@@ -75,10 +75,9 @@ def login_twitter(page, username, password):
 
 
 def getTweetData():
-    twitter_handlers = ["Abhi4Research", "AimInvestments", "viveksingh2010", "AnirbanManna10", "dhuperji", "SnehaSSR", "TradingMarvel", "sainaman2", "sushilpathiyar", "Trading0secrets",
-                        "indian_stockss","nilishamantri_","MySoctr", "rdkriplani","Milind4profits","jayneshkasliwal", "breakoutsfreak", "adeptmarket","tbportal","beyondtrading07","gogrithekhabri",
-                        "wealthexpress21","StockInfotech","mystocks_in","saditya10p","KhapreVishal","_ChartWizard_","curious_shubh","marketViewbyPB","Deishma","KommawarSwapnil","Sahilpahwa09","fintech00",
-                        "sunilgurjar01","CaVivekkhatri","KhapreVishal","itsprekshaBaid","thebigbulldeals","TbPortal","Bnf_unicorn","pahari_trader","darvasboxtrader"]
+    twitter_handlers = ["Abhi4Research", "AimInvestments", "AnirbanManna10","SnehaSSR", "TradingMarvel","Trading0secrets",
+                            "indian_stockss","MySoctr", "rdkriplani","Milind4profits","jayneshkasliwal","tbportal","beyondtrading07","mystocks_in","KhapreVishal","_ChartWizard_","curious_shubh","marketViewbyPB","Deishma","KommawarSwapnil","Sahilpahwa09","fintech00",
+                        "thebigbulldeals","pahari_trader","darvasboxtrader"]
 
     # Divide handlers into two groups
     handlers_user1 = twitter_handlers[:len(twitter_handlers) // 2]

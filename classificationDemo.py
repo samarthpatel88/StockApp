@@ -28,7 +28,7 @@ stock_keywords = {"averages", "bear", "bearish", "book", "breakout", "breakouts"
                      "ratios", "revenue", "risk", "roe", "securities", "shares", "short", "sl", "stoploss",
                      "stock", "stocks", "support", "swing", "target", "technical", "trade", "trading", "trends",
                      "valuation", "venture", "volume", "volatility","expiry", "nifty","nifty50", "sensex","techno","funda","Stockmarket",
-                     "sector", "banking","buying","holding"
+                     "sector", "banking","buying","holding","midcap","smallcap"
                      }
 
 
@@ -58,7 +58,7 @@ def is_stockmarket_related(tweet):
 
 
 # Classify the tweets
-results = [
+'''results = [
     {
         "tweet": tweet,
         "category": "stockmarket" if is_stockmarket_related(tweet)[0] else "nonstockmarket",
@@ -70,3 +70,4 @@ results = [
 # Print the results
 for result in results:
     print(f"Tweet: {result['tweet']}\nCategory: {result['category']}\nMatching Symbols: {result['matching_symbols']}\n")
+'''

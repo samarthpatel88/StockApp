@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Add Trade{% endblock %}
+{% block content %}
+  <h2 class="mb-3">Add Trade</h2>
+  <form action="{{ url_for('add_trade') }}" method="post" enctype="multipart/form-data">
+    <!-- First row: Stock Symbol and Stock Name -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="stock_symbol" class="form-label">Stock Symbol:</label>
+        <input type="text" name="stock_symbol" id="stock_symbol" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <label for="stock_name" class="form-label">Stock Name:</label>
+        <input type="text" name="stock_name" id="stock_name" class="form-control" required>
+      </div>
+    </div>
+    <!-- Second row: Trade Style, Market Trend, and Trade Setup -->
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label for="trade_style" class="form-label">Trade Style:</label>
+        <select name="trade_style" id="trade_style" class="form-select" required>
+          <option value="">--Select Trade Style--</option>
+          <option value="Swing Trading">Swing Trading</option>
+          <option value="Positional Trading">Positional Trading</option>
+          <option value="Fundamental Pick">Fundamental Pick</option>
+          <option value="Day Trading">Day Trading</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="market_trend" class="form-label">Market Trend:</label>
+        <select name="market_trend" id="market_trend" class="form-select" required>
+          <option value="">--Select Market Trend--</option>
+          <option value="Up">Up</option>
+          <option value="Down">Down</option>
+          <option value="SideWay">SideWay</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="trade_setup" class="form-label">Trade Setup:</label>
+        <select name="trade_setup" id="trade_setup" class="form-select" required>
+          <option value="">--Select Trade Setup--</option>
+          <option value="Pullback">Pullback</option>
+          <option value="Reversal">Reversal</option>
+          <option value="Range-bound">Range-bound</option>
+          <option value="Break-out">Break-out</option>
+          <option value="Moving Average Crossover">Moving Average Crossover</option>
+          <option value="News-Based">News-Based</option>
+          <option value="Trend Following">Trend Following</option>
+        </select>
+      </div>
+    </div>
+    <!-- Third row: Entry Price and Trade Quantity -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="entry_price" class="form-label">Entry Price:</label>
+        <input type="number" step="0.01" name="entry_price" id="entry_price" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <label for="trade_quantity" class="form-label">Trade Quantity:</label>
+        <input type="number" name="trade_quantity" id="trade_quantity" class="form-control" required>
+      </div>
+    </div>
+    <!-- Fourth row: Stop Loss and Target Price -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="stop_loss" class="form-label">Stop Loss:</label>
+        <input type="number" step="0.01" name="stop_loss" id="stop_loss" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <label for="target_price" class="form-label">Target Price:</label>
+        <input type="number" step="0.01" name="target_price" id="target_price" class="form-control" required>
+      </div>
+    </div>
+    <!-- Fifth row: Trade Tip Link and Entry Chart Image -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="trade_tip_link" class="form-label">Trade Tip Link:</label>
+        <input type="url" name="trade_tip_link" id="trade_tip_link" class="form-control">
+      </div>
+      <div class="col-md-6">
+        <label for="entry_chart_image" class="form-label">Entry Chart Image:</label>
+        <input type="file" name="entry_chart_image" id="entry_chart_image" class="form-control" accept="image/*">
+      </div>
+    </div>
+    <button type="submit" class="btn btn-success">Submit</button>
+  </form>
+{% endblock %}

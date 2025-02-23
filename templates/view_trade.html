@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}View Trade{% endblock %}
+{% block content %}
+  <h2 class="mb-3">Trade Details</h2>
+  <div class="row">
+    <div class="col-md-6">
+      <p><strong>Stock Symbol:</strong> {{ trade.stock_symbol }}</p>
+      <p><strong>Entry Price:</strong> {{ trade.entry_price }}</p>
+      <p><strong>Stop Loss:</strong> {{ trade.stop_loss }}</p>
+      <p><strong>Target Price:</strong> {{ trade.target_price }}</p>
+      <p><strong>Trade Quantity:</strong> {{ trade.trade_quantity }}</p>
+    </div>
+    <div class="col-md-6">
+      <p><strong>Investment Value:</strong> {{ trade.investment_value }}</p>
+      <p><strong>Risk/Reward Ratio:</strong> {{ trade.risk_reward_ratio }}</p>
+      <p><strong>Exit Price:</strong> {{ trade.exit_price or 'N/A' }}</p>
+      <p><strong>Profit/Loss Amount:</strong> {{ trade.profit_loss_amount or 'N/A' }}</p>
+      <p><strong>Profit/Loss Percentage:</strong> {{ trade.profit_loss_percentage or 'N/A' }}</p>
+      {% if trade.trade_tip_link %}
+        <p><strong>Trade Tip:</strong> <a href="{{ trade.trade_tip_link }}" target="_blank">{{ trade.trade_tip_link }}</a></p>
+      {% endif %}
+    </div>
+  </div>
+  {% if trade.entry_chart_image %}
+    <div class="mb-3">
+      <h5>Entry Chart:</h5>
+      <img src="{{ url_for('static', filename=trade.entry_chart_image) }}" class="img-fluid" alt="Entry Chart">
+    </div>
+  {% endif %}
+  {% if trade.exit_chart_image %}
+    <div class="mb-3">
+      <h5>Exit Chart:</h5>
+      <img src="{{ url_for('static', filename=trade.exit_chart_image) }}" class="img-fluid" alt="Exit Chart">
+    </div>
+  {% endif %}
+  <a href="{{ url_for('trade_list') }}" class="btn btn-secondary">Back to Trade List</a>
+{% endblock %}

@@ -3,6 +3,7 @@ import os
 import time
 from datetime import datetime, timedelta
 from playwright.sync_api import sync_playwright
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 tweet_objects = []
 
@@ -68,7 +69,7 @@ def scrape_tweets(page, unique_tweets):
 
 def login_twitter(page, username, password):
     """Logs into Twitter using provided credentials."""
-    page.goto("https://twitter.com/i/flow/login", timeout=60000, wait_until="load")
+    page.goto("https://x.com/i/flow/login", timeout=60000, wait_until="load")
 
     page.fill('input[autocomplete="username"]', username)
     page.keyboard.press('Enter')
@@ -80,8 +81,12 @@ def login_twitter(page, username, password):
 
 def get_tweet_data():
     """Fetches tweets from multiple Twitter accounts and saves them."""
-    twitter_handlers = ["Abhi4Research", "AimInvestments", "viveksingh2010", "AnirbanManna10", "dhuperji", "SnehaSSR", "TradingMarvel", "sainaman2", "sushilpathiyar", "Trading0secrets",
-                        "indian_stockss","nilishamantri_","MySoctr", "rdkriplani"]
+    twitter_handlers = ["Abhi4Research", "AimInvestments", "AnirbanManna10", "SnehaSSR", "TradingMarvel",
+                        "Trading0secrets","PulkitA30298377",
+                        "indian_stockss", "MySoctr", "rdkriplani", "Milind4profits", "jayneshkasliwal", "tbportal",
+                        "beyondtrading07", "mystocks_in", "KhapreVishal", "_ChartWizard_", "curious_shubh",
+                        "marketViewbyPB", "Deishma", "KommawarSwapnil", "Sahilpahwa09", "fintech00",
+                        "thebigbulldeals", "pahari_trader", "darvasboxtrader","CNBCTV18Live",""]
 
     handlers_user1 = twitter_handlers[:len(twitter_handlers) // 2]
     handlers_user2 = twitter_handlers[len(twitter_handlers) // 2:]
@@ -105,9 +110,14 @@ def get_tweet_data():
             login_twitter(page, username, password)
 
             for target_url in handlers:
-                page.goto(f"https://twitter.com/{target_url}", timeout=100000, wait_until="load")
-                page.wait_for_selector("article[data-testid='tweet']", timeout=100000)  # Ensure tweets load
-                scrape_tweets(page, unique_tweets)
+                try:
+                    print('handler:', target_url)
+                    page.goto(f"https://x.com/{target_url}", timeout=20000, wait_until="load")  # Reduced timeout
+                    page.wait_for_selector("article[data-testid='tweet']",
+                                           timeout=10000)  # Reduced timeout for better flow
+                    scrape_tweets(page, unique_tweets)  # Extract tweets if successful
+                except PlaywrightTimeoutError:
+                    print(f"Skipping {target_url} due to timeout.")
 
             page.close()
 
